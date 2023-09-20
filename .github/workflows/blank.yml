@@ -4,31 +4,22 @@ on:
   push:
     branches:
       - main
-
+  workflow_dispatch:
+  
 jobs:
-  deploy:
+  run_pull:
+    name: run pull
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Install SSH client
+    - name: install ssh keys
+      # check this thread to understand why its needed:
+      # https://stackoverflow.com/a/70447517
       run: |
-        sudo apt-get update
-        sudo apt-get install -y openssh-client
-
-    - name: Deploy to VPS
-      env:
-        DEPLOY_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-        HOST: 197.140.18.68
-        USER: root
-      run: |
-        echo "$DEPLOY_KEY" > deploy_key
-        chmod 600 deploy_key
-        ssh -o StrictHostKeyChecking=no -i deploy_key $USER@$HOST <<EOF
-          cd /docker-app/deeplyfe_backend
-          git pull
-          docker-compose up -d
-        EOF
-        rm -f deploy_key
+        install -m 600 -D /dev/null ~/.ssh/id_rsa
+        echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        ssh-keyscan -H 197.140.18.68 > ~/.ssh/known_hosts
+    - name: connect and pull
+      run: ssh root@197.140.18.68
+    - name: cleanup
+      run: rm -rf ~/.ssh
