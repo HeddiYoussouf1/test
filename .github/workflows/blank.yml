@@ -8,35 +8,21 @@ on:
 
 jobs:
   run_pull:
-    name: run pull
+    name: Run pull
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Ensure SSH directory exists
-      run: mkdir -p ~/.ssh
+      - name: Set up SSH
+        uses: actions/setup-ssh@v3
+        with:
+          ssh-key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
 
-    - name: Create id_rsa file
-      run: |
-        touch ~/.ssh/id_rsa 
-        chmod 600 ~/.ssh/id_rsa
-
-    - name: Setup SSH Key
-      run: echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-    - name: echo
-      run: cat .ssh/id_rsa
-    - name: Add VPS to known hosts
-      run: ssh-keyscan -H 197.140.18.68 > ~/.ssh/known_hosts
-
-    - name: Connect to VPS and Run Commands
-      run: |
-        ssh -o StrictHostKeyChecking=no -T root@197.140.18.68 "
-          cd /path/to/your/repo;
-          git pull;
-          # Add other necessary commands, e.g. docker restart or similar
-        "
-
-    - name: Cleanup
-      run: rm -rf ~/.ssh
+      - name: Connect to VPS and Run Commands
+        run: |
+          ssh -o StrictHostKeyChecking=no -T root@197.140.18.68 "
+            cd /path/to/your/repo;
+            git pull;
+            # Add other necessary commands, e.g. docker restart or similar
