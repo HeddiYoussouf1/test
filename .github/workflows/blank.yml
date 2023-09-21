@@ -16,22 +16,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 197.140.18.68 >> ~/.ssh/known_hosts
-
-    - name: Deploy to VPS
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@197.140.18.68 <<EOF
-          cd ~
-          git pull
-          # Any other deployment-related commands go here
-          # For instance, if using Docker:
-          # docker-compose up -d
-        EOF
+    - name: Install SSH Key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
     - name: Deploy to Server
       uses: easingthemes/ssh-deploy@main
       with:
