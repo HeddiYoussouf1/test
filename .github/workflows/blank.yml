@@ -25,6 +25,7 @@ jobs:
             whoami
             ls -al
           SCRIPT_AFTER: |
-            whoami
-            ls -al
+            cd docker-app/deeplyfe_backend
+            docker-compose pull
+            docker-compose up -d
             echo $RSYNC_STDOUT
