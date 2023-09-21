@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+     - uses: actions/checkout@v2
+     - name: Install SSH dependencies
+       run: sudo apt install openssh-client
      - name: Install sshpass
        run: sudo apt-get install -y sshpass
      - name: Run Commands on VPS
